@@ -81,10 +81,11 @@
                            /*
                             * Generate the logout button
                             */
-                           v_html += '<form method=get id="frmLogout" class="panel" name="frmLogout" action="index.html">'
-                                  + '<a class="whiteButton" type="submit">Log out</a>'
-                                  + '</form>';
-                       $("#screen2").html(v_html);
+//                           v_html += '<form method=get id="frmLogout" class="panel" name="frmLogout" action="index.html">'
+//                                  + '<a class="whiteButton" type="submit">Log out</a>'
+//                                  + '</form>';
+                           v_html += '<a class="whiteButton" href="#screen1">Log out</a>';
+                          $("#screen2").html(v_html);
                    })
                 });
             }
@@ -94,7 +95,7 @@
         <div class="toolbar">
             <h1 id="pageTitle"></h1>
         </div>
-        <form id="screen1" title="Login page v_B1313" class="panel" name="formname" action="#screen2" method="post" selected="true">
+        <form id="screen1" title="Login page v_B1351" class="panel" name="formname" action="#screen2" method="post" selected="true">
             <fieldset>
                 <div class="row">
                     <label>Login</label>
