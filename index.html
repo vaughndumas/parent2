@@ -75,7 +75,8 @@
                            if (v_prevstudent != -9) {
                                v_html += '</tbody></table><br />';
                                v_html += '</li></ul>';
-                           }
+                           }                           
+                       }
                            
                            /*
                             * Generate the logout button
@@ -83,8 +84,6 @@
                            v_html += '<form method=get id="frmLogout" class="panel" name="frmLogout" action="index.html">'
                                   + '<a class="whiteButton" type="submit">Log out</a>'
                                   + '</form>';
-                           
-                       }
                        $("#screen2").html(v_html);
                    })
                 });
