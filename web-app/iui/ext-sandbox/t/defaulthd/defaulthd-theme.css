@@ -18,7 +18,7 @@ li > a[selected], li > a:active {
 
 li > a[selected="progress"] {
 	background-image: url(../../../t/default/loading.gif), url(selection-hd.png) !important;
-	background-size: 1px 43px;
+	background-size: , 1px 43px;
 	-webkit-tap-highlight-color: transparent;
 }
 
