@@ -9,6 +9,45 @@
         <script src="web-app/iui/iui.js" type="text/javascript"></script>
         <script src="web-app/iui/jquery-1.11.1.min.js" type="text/javascript"></script>
         <script type="text/javascript">
+            
+            function check_route_stop(x_stop_name, x_counter, x_hardwareid, x_route_id) {
+                v_counter = x_counter;
+                console.log("Checking for route stop: " + x_stop_name + ":" + x_counter + ":" + x_hardwareid + ":" + x_route_id);
+                v_url = "http://wcc.tracking-intelligence.com/ri/check_route_stop";
+                //v_url = "http://wits-wcc.local/ri/check_route_stop";
+                $(function() {
+                    $.ajax({
+                    url:  v_url,
+                    type: "POST",
+                    data: {x_stop_name: x_stop_name, x_hardwareid:x_hardwareid, x_route_id: x_route_id}
+                })
+                .done(function(v_data) {
+                    var v_return = v_data;
+                    console.log("Checking for route stop: " + x_stop_name + ":" + x_counter + ":" + x_hardwareid + ":" + x_route_id + " -> " + v_return);
+                    if (v_return === "0") {
+                        v_counter ++;
+                        if (v_counter > 10) return;
+                        setTimeout('check_route_stop("' + x_stop_name + '",' + v_counter + ',' + x_hardwareid + ',' + x_route_id + ')', 5000);
+                    } else {
+                        // Get the manifest row
+                        // Set the attributes to green
+                        var v_setnext = 0;
+                        $("table.tsbus").find("td.greyButton").each(function(index) {
+                              if (($(this).attr("tstype") === "Stop") && $(this).text() === x_stop_name) {
+                                  $(this).attr("tscounter", "0");
+                                  $(this).attr("class", "greenButton");
+                                  v_setnext = 1;
+                                  setTimeout('check_route_stop("' + $(this).text() + '",' + $(this).attr("tscounter") + ',' + $(this).attr("tshardwareid") + ',' + $(this).attr("tsrouteid") + ')', 15000);
+                              } else if (($(this).attr("tstype") === "StopTime") && (v_setnext === 1)) {
+                                  $(this).attr("class", "greenButton");
+                                  v_setnext = 0;
+                              }
+                          });
+                    }
+                })
+                });
+            }
+            
             function validate_user() {
                 var v_username = $("#username").val();
                 var v_password = $("#password").val();
@@ -67,7 +106,8 @@
                                if (v_arrived_at[v_manifest[v_counter].stop_name + v_manifest[v_counter].hardwareid] != undefined) {
                                  v_html += '<tr><td class="greenButton">' + v_manifest[v_counter].stop_name + '</td><td class="greenButton">' + v_arrived_at[v_manifest[v_counter].stop_name + v_manifest[v_counter].hardwareid] + '</td></tr>\n';
                                } else {
-                                 v_html += '<tr><td class="greyButton">' + v_manifest[v_counter].stop_name + '</td><td class="greyButton">' + v_manifest[v_counter].arrival_time + '</td></tr>\n';
+                                 v_html += '<tr><td class="greyButton" tstype="Stop" tscounter="0" tshardwareid="' + v_manifest[v_counter].hardwareid + '" tsrouteid="' + v_manifest[v_counter].route_id + '">' + v_manifest[v_counter].stop_name + '</td>';
+                                 v_html += '<td class="greyButton" tstype="StopTime">' + v_manifest[v_counter].arrival_time + '</td></tr>\n';
                                }
 
                                v_prevstudent = v_manifest[v_counter].student_id;
@@ -86,6 +126,13 @@
 //                                  + '</form>';
                            v_html += '<a class="whiteButton" href="#screen1">Log out</a>';
                           $("#screen2").html(v_html);
+                          
+                          // Get all tables and check which items are still grey
+                          $("table.tsbus").find("td.greyButton").each(function(index) {
+                              if ($(this).attr("tstype") === "Stop") {
+                                  setTimeout('check_route_stop("' + $(this).text() + '",' + $(this).attr("tscounter") + ',' + $(this).attr("tshardwareid") + ',' + $(this).attr("tsrouteid") + ')', 15000);
+                              }
+                          });
                    })
                 });
             }
@@ -99,11 +146,11 @@
             <fieldset>
                 <div class="row">
                     <label>Login</label>
-                    <input type="text" id="username" name="username" placeholder="Your login username">
+                    <input type="text" id="username" name="username" placeholder="Your login username" value="jseymour">
                 </div>
                 <div class="row">
                     <label>Password</label>
-                    <input type="password" id="password" name="password" placeholder="Your password">
+                    <input type="password" id="password" name="password" placeholder="Your password" value="ts123">
                 </div>
             </fieldset>
             <a class="whiteButton" href="#screen2" onClick="validate_user();">Log me in!</a>
